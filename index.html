@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What You Want? - World's #1 Next-Gen Super App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+        }
+
+        /* --- SOS Panic Alert Overlay --- */
+        .sos-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(220, 38, 38, 0.85); z-index: 3000; display: none;
+            align-items: center; justify-content: center; flex-direction: column; color: white; text-align: center; padding: 20px;
+        }
+        .sos-overlay.active { display: flex; }
+        .sos-pulse-ring {
+            width: 120px; height: 120px; background: #fee2e2; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 50px;
+            animation: sosPulse 1s infinite; margin-bottom: 20px; box-shadow: 0 0 40px #fff;
+        }
+        @keyframes sosPulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.25); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* --- In-App Modal Overlay (WYW Interface Wrapper) --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.75); z-index: 2000; display: none;
+            align-items: center; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: #ffffff; width: 92%; max-width: 540px; border-radius: 18px;
+            overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+            animation: modalPop 0.3s ease;
+        }
+        @keyframes modalPop {
+            0% { transform: scale(0.85); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .modal-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-title { font-size: 15px; font-weight: bold; color: #38bdf8; display: flex; align-items: center; gap: 6px; }
+        .modal-close-btn { background: transparent; border: none; color: white; font-size: 20px; cursor: pointer; }
+        .modal-body { padding: 20px; max-height: 480px; overflow-y: auto; text-align: left; }
+
+        /* --- Registration & Partner Form Styling --- */
+        .reg-form-group { margin-bottom: 14px; }
+        .reg-form-group label { display: block; font-size: 12px; font-weight: bold; color: #1e293b; margin-bottom: 5px; }
+        .reg-form-group input, .reg-form-group select {
+            width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; outline: none; background: #f8fafc;
+        }
+        .reg-form-group input:focus, .reg-form-group select:focus { border-color: #38bdf8; background: #fff; }
+        .reg-submit-btn {
+            width: 100%; background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: white; border: none;
+            padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; margin-top: 5px;
+        }
+        .reg-submit-btn:hover { background: #1e3a8a; }
+
+        /* WYW Branded Google-Data Cards */
+        .service-result-card {
+            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
+            padding: 12px 15px; margin-bottom: 12px; text-align: left; border-left: 4px solid #0284c7;
+        }
+        .result-name { font-size: 14px; font-weight: bold; color: #0f172a; margin-bottom: 3px; }
+        .result-details { font-size: 12px; color: #475569; margin-bottom: 6px; }
+        .result-footer { display: flex; justify-content: space-between; align-items: center; font-size: 11px; border-top: 1px solid #e2e8f0; padding-top: 6px; }
+        .result-rating { color: #d97706; font-weight: bold; }
+        .call-btn { background: #16a34a; color: white; text-decoration: none; padding: 4px 10px; border-radius: 6px; font-weight: bold; }
+
+        /* --- Navbar --- */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center; padding: 10px 15px;
+            background-color: #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100;
+        }
+        .nav-left { display: flex; align-items: center; gap: 12px; }
+        .menu-toggle-btn { background: transparent; border: none; cursor: pointer; display: flex; flex-direction: column; gap: 4px; padding: 4px; }
+        .menu-toggle-btn span { display: block; width: 22px; height: 2.5px; background-color: #0f172a; border-radius: 2px; }
+        
+        .nav-brand { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .nav-logo { width: 85px; height: auto; object-fit: contain; margin-bottom: -12px; }
+        .logo { font-size: 16px; font-weight: bold; color: #0f172a; line-height: 1; }
+
+        .location-badge {
+            display: flex; align-items: center; gap: 4px; font-size: 11px;
+            background: #f1f5f9; padding: 5px 10px; border-radius: 20px; color: #475569; font-weight: 600; cursor: pointer;
+        }
+
+        .nav-right { display: flex; align-items: center; gap: 8px; }
+        .profile-btn { background: #f1f5f9; border: 1px solid #cbd5e1; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; }
+        
+        .vendor-container { display: flex; flex-direction: column; align-items: center; }
+        .vendor-btn button { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: #fff; border: none; padding: 5px 8px; border-radius: 6px; font-size: 10px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+        .sub-timer { font-size: 8px; color: #e11d48; font-weight: bold; margin-top: 2px; text-align: center; }
+
+        /* --- Sidebar Drawer --- */
+        .sidebar-drawer { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #ffffff; box-shadow: 5px 0 15px rgba(0,0,0,0.2); z-index: 1000; transition: left 0.3s ease; overflow-y: auto; }
+        .sidebar-drawer.active { left: 0; }
+        .drawer-header { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: white; padding: 20px; display: flex; align-items: center; justify-content: space-between; }
+        .drawer-close { background: transparent; border: none; color: white; font-size: 20px; cursor: pointer; }
+        .drawer-menu-list { list-style: none; padding: 10px 0; }
+        .drawer-menu-list li a { display: block; padding: 12px 20px; color: #334155; text-decoration: none; font-size: 14px; font-weight: 500; border-bottom: 1px solid #f1f5f9; }
+        .drawer-menu-list li a:hover { background-color: #f8fafc; color: #0284c7; }
+        .drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; }
+        .drawer-overlay.active { display: block; }
+
+        /* --- Hero Section & Weather Widget --- */
+        .hero-section {
+            position: relative; text-align: center; padding: 35px 20px 65px 20px;
+            background: linear-gradient(135deg, #07162c 0%, #0f2b4c 50%, #1e3a8a 100%); overflow: hidden;
+        }
+        .hero-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 650px; height: 650px; background: radial-gradient(circle, rgba(14, 165, 233, 0.45) 0%, rgba(0, 0, 0, 0) 70%); z-index: 1; pointer-events: none; }
+        .hero-content { position: relative; z-index: 2; }
+        
+        .hero-weather-widget {
+            position: absolute; top: 12px; right: 15px; z-index: 10;
+            display: flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3); backdrop-filter: blur(8px);
+            padding: 5px 10px; border-radius: 20px; font-size: 11px; color: #ffffff; font-weight: bold;
+        }
+        .hero-weather-widget span { font-size: 14px; }
+
+        .hero-top-logo { display: block; margin: 0 auto -25px auto; width: 220px; height: auto; object-fit: contain; transform: scale(2.1); filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.8)); }
+        .hero-section h1 { font-size: 30px; margin-bottom: 20px; font-weight: 700; background: linear-gradient(135deg, #38bdf8 0%, #fb923c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .search-container {
+            display: flex; align-items: center; max-width: 580px; margin: 0 auto;
+            background: #fff; border-radius: 35px; padding: 6px 15px 6px 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+        }
+        .search-container input { flex: 1; border: none; padding: 10px 0; font-size: 15px; outline: none; color: #333; background: transparent; }
+        .search-actions { display: flex; align-items: center; gap: 8px; }
+
+        .ai-scan-icon-btn { background: transparent; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 5px; border-radius: 50%; transition: transform 0.2s; }
+        .ai-scan-icon-btn:hover { transform: scale(1.15); }
+        .scanner-corner-svg { width: 22px; height: 22px; stroke: #0284c7; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+        .mic-btn {
+            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+            border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            padding: 8px; border-radius: 50%; box-shadow: 0 4px 10px rgba(14, 165, 233, 0.4); transition: transform 0.2s;
+        }
+        .mic-btn:hover { transform: scale(1.08); }
+        .mic-icon-svg { width: 20px; height: 20px; fill: #ffffff; }
+
+        /* Main Container & Grids */
+        .main-container { max-width: 1000px; margin: 0 auto; padding: 25px 15px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; margin-top: 22px; }
+        .section-title { font-size: 17px; font-weight: bold; color: #1e293b; }
+
+        .categories-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 15px; }
+        .category-card { background: #ffffff; padding: 14px 6px; border-radius: 12px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.03); cursor: pointer; border: 1px solid #e2e8f0; transition: transform 0.2s; }
+        .category-card:hover { transform: translateY(-2px); border-color: #38bdf8; }
+        .category-card .icon { font-size: 24px; display: block; margin-bottom: 6px; }
+        .category-card h3 { font-size: 11px; color: #1e293b; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .cctv-custom-logo { width: 34px; height: 34px; display: block; margin: 0 auto 4px auto; }
+
+        .emergency-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 15px; }
+        .emergency-card { background: #fff5f5; border: 1px solid #feb2b2; padding: 14px 6px; border-radius: 12px; text-align: center; cursor: pointer; }
+        .emergency-card .icon { font-size: 24px; display: block; margin-bottom: 6px; }
+        .emergency-card h3 { font-size: 11px; color: #c53030; font-weight: bold; }
+
+        .market-options-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 15px; }
+        .market-card { background: #ffffff; padding: 12px 6px; border-radius: 12px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.03); cursor: pointer; border: 1px solid #e2e8f0; transition: transform 0.2s; }
+        .market-card:hover { transform: translateY(-2px); border-color: #38bdf8; }
+        .market-card .icon { font-size: 22px; display: block; margin-bottom: 5px; }
+        .market-card h3 { font-size: 10px; color: #1e293b; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .brand-new-banner { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: #fff; padding: 18px; border-radius: 14px; margin: 25px 0 12px 0; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #38bdf8; }
+        .brand-new-banner h2 { font-size: 17px; margin-bottom: 4px; color: #38bdf8; }
+        .brand-new-banner p { font-size: 11px; color: #94a3b8; margin: 0; }
+        .btn-brand-new { background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%); color: #fff; border: none; padding: 9px 14px; border-radius: 8px; font-weight: bold; font-size: 11px; cursor: pointer; }
+
+        .secondhand-banner { background: linear-gradient(135deg, #78350f 0%, #b45309 50%, #d97706 100%); color: #fff; padding: 18px; border-radius: 14px; margin: 30px 0 12px 0; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #fde047; }
+        .secondhand-banner h2 { font-size: 17px; margin-bottom: 4px; color: #fef08a; }
+        .secondhand-banner p { font-size: 11px; color: #ffedd5; margin: 0; }
+        .btn-secondhand { background: linear-gradient(135deg, #facc15 0%, #ca8a04 100%); color: #422006; border: none; padding: 9px 14px; border-radius: 8px; font-weight: bold; font-size: 11px; cursor: pointer; }
+
+        .horizontal-scroll-container { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; scroll-behavior: smooth; }
+        .horizontal-scroll-container::-webkit-scrollbar { height: 5px; }
+        .horizontal-scroll-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+        .product-card { min-width: 145px; max-width: 145px; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; flex-shrink: 0; cursor: pointer; }
+        .product-img { width: 100%; height: 95px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 28px; position: relative; }
+        .badge-new { position: absolute; top: 6px; left: 6px; background: #2563eb; color: #fff; font-size: 8px; padding: 2px 5px; border-radius: 3px; font-weight: bold; }
+        .product-details { padding: 9px; }
+        .product-title { font-size: 11px; font-weight: 600; color: #1e293b; margin: 0 0 3px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-price { font-size: 12px; font-weight: bold; color: #ea580c; margin: 0 0 2px 0; }
+        .product-loc { font-size: 9px; color: #64748b; margin: 0; }
+
+        .footer { display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; padding: 22px; background-color: #ffffff; border-top: 1px solid #e2e8f0; margin-top: 30px; }
+        .footer a { color: #64748b; text-decoration: none; font-size: 12px; font-weight: 500; }
+
+        @media(max-width: 768px) {
+            .market-options-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+  <body>
+    <div class="sos-overlay" id="sosPanicOverlay">
+        <div class="sos-pulse-ring">🚨</div>
+        <h2 style="font-size: 24px; margin-bottom: 10px;">SOS EMERGENCY SHIELD ACTIVE</h2>
+        <p style="font-size: 14px; max-width: 400px; margin-bottom: 25px;" id="sosStatusMsg">Broadcasting your live GPS location to emergency contacts, police & nearest hospital...</p>
+        <button onclick="deactivateSOS()" style="background: white; color: #dc2626; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;">Cancel / Safe Now</button>
+    </div>
+
+    <div class="modal-overlay" id="appModalOverlay" onclick="closeAppModal()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitleText">✨ What You Want? Assistant</div>
+                <button class="modal-close-btn" onclick="closeAppModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modalResultsContainer"></div>
+        </div>
+    </div>
+
+    <div class="drawer-overlay" id="drawerOverlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar-drawer" id="sidebarDrawer">
+        <div class="drawer-header">
+            <h3>Hello, User 👋</h3>
+            <button class="drawer-close" onclick="toggleSidebar()">✕</button>
+        </div>
+        <ul class="drawer-menu-list">
+            <li><a href="#" onclick="runGoogleDirectorySearch('Settings & Privacy')">⚙️ Settings & Privacy</a></li>
+            <li><a href="#" onclick="runGoogleDirectorySearch('Your Orders')">📦 Your Orders & Deliveries</a></li>
+            <li><a href="#" onclick="runGoogleDirectorySearch('Help & Barter Circle')">🤝 Help & Community Barter</a></li>
+            <li><a href="#" onclick="runGoogleDirectorySearch('Business Listings')">🏪 Global Business Listings</a></li>
+            <li><a href="#" onclick="runGoogleDirectorySearch('Customer Support')">🎧 Help & Customer Care</a></li>
+            <li><a href="#" onclick="runGoogleDirectorySearch('Account Logout')">🚪 Logout / Switch Account</a></li>
+        </ul>
+    </div>
+
+    <header class="navbar">
+        <div class="nav-left">
+            <button class="menu-toggle-btn" onclick="toggleSidebar()" title="Open Menu">
+                <span></span><span></span><span></span>
+            </button>
+            <div class="nav-brand">
+                <img src="logo/logo.png" alt="Logo" class="nav-logo">
+                <div class="logo">WYW</div>
+            </div>
+        </div>
+
+        <div class="location-badge" id="locationBadge" onclick="detectUserLocation()" title="Click to refresh GPS location">
+            <span>📍 Detecting GPS...</span>
+        </div>
+
+        <div class="nav-right">
+            <button class="profile-btn" onclick="runGoogleDirectorySearch('User Profile')" title="Profile">👤</button>
+            <div class="vendor-container">
+                <div class="vendor-btn">
+                    <button onclick="openRegistrationForm()">Free Registration</button>
+                </div>
+                <div class="sub-timer" id="timer">⏳ 11h 45m left</div>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero-section">
+        <div class="hero-weather-widget" id="weatherWidgetBox" title="Live Weather">
+            <span id="weatherIcon">☀️</span>
+            <span id="weatherTemp">24°C</span>
+        </div>
+
+        <div class="hero-glow"></div>
+        <div class="hero-content">
+            <img src="logo/logo.png" alt="Logo" class="hero-top-logo">
+            <h1>What You Want?</h1>
+            
+            <div class="search-container">
+                <input type="text" placeholder="What You Want?" id="globalSearchInput" onkeypress="handleGlobalSearch(event)">
+                <div class="search-actions">
+                    <button class="ai-scan-icon-btn" onclick="openAIScanner()" title="AI Scanner">
+                        <svg class="scanner-corner-svg" viewBox="0 0 24 24">
+                            <path d="M4 8V6a2 2 0 0 1 2-2h2"/>
+                            <path d="M16 4h2a2 2 0 0 1 2 2v2"/>
+                            <path d="M20 16v2a2 2 0 0 1-2 2h-2"/>
+                            <path d="M8 20H6a2 2 0 0 1-2-2v-2"/>
+                        </svg>
+                    </button>
+                    <button class="mic-btn" onclick="startVoiceSearch()" title="Voice Search">
+                        <svg class="mic-icon-svg" viewBox="0 0 24 24" width="20" height="20">
+                            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="main-container">
+        <div class="section-header"><h2 class="section-title">Explore Categories</h2></div>
+        <div class="categories-grid">
+            <div class="category-card" onclick="runGoogleDirectorySearch('Local Electricians')"><span class="icon">⚡</span><h3>Electrician</h3></div>
+            <div class="category-card" onclick="runGoogleDirectorySearch('Plumbers')"><span class="icon">🚰</span><h3>Plumber</h3></div>
+            <div class="category-card" onclick="runGoogleDirectorySearch('Carpenters')"><span class="icon">🪑</span><h3>Carpenter</h3></div>
+            <div class="category-card" onclick="runGoogleDirectorySearch('CCTV Installation')">
+                <svg class="cctv-custom-logo" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2">
+                    <path d="M2 12h20M12 12V4M7 4h10M5 16l3-4h8l3 4M12 16v4"/>
+                </svg>
+                <h3>CCTV Setup</h3>
+            </div>
+        </div>
+
+        <div class="section-header"><h2 class="section-title">🚨 Emergency SOS Shield</h2></div>
+        <div class="emergency-grid">
+            <div class="emergency-card" onclick="triggerSOS('Police')"><span class="icon">👮</span><h3>Police</h3></div>
+            <div class="emergency-card" onclick="triggerSOS('Ambulance')"><span class="icon">🚑</span><h3>Ambulance</h3></div>
+            <div class="emergency-card" onclick="triggerSOS('Fire')"><span class="icon">🚒</span><h3>Fire Dept</h3></div>
+            <div class="emergency-card" onclick="triggerSOS('Women Safety')"><span class="icon">🛡️</span><h3>Women SOS</h3></div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <a href="#">About WYW</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Contact Support</a>
+    </footer>
+</body>
+</html>
+
