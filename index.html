@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What You Want? - World's #1 Next-Gen Super App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+        }
+
+        /* --- SOS Panic Overlay --- */
+        .sos-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(220, 38, 38, 0.9); z-index: 3000; display: none;
+            align-items: center; justify-content: center; flex-direction: column; color: white; text-align: center; padding: 20px;
+        }
+        .sos-overlay.active { display: flex; }
+        .sos-pulse-ring {
+            width: 120px; height: 120px; background: #fee2e2; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 50px;
+            animation: sosPulse 1s infinite; margin-bottom: 20px; box-shadow: 0 0 40px #fff;
+        }
+        @keyframes sosPulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.25); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* --- Navbar --- */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center; padding: 4px 15px;
+            background-color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.06); position: sticky; top: 0; z-index: 100;
+        }
+        .nav-left { display: flex; align-items: center; gap: 14px; }
+        .menu-toggle-btn { background: transparent; border: none; cursor: pointer; display: flex; flex-direction: column; gap: 4px; padding: 4px; }
+        .menu-toggle-btn span { display: block; width: 22px; height: 2.5px; background-color: #0f172a; border-radius: 2px; }
+        
+        .nav-brand { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            line-height: 0.8;
+            padding: 2px 0;
+        }
+        .nav-logo { 
+            width: 30px; 
+            height: auto; 
+            object-fit: contain; 
+            margin-bottom: -6px;
+            display: block;
+        }
+        .logo { 
+            font-size: 11px; 
+            font-weight: 800; 
+            color: #0f172a; 
+            letter-spacing: 0.5px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .location-badge {
+            display: flex; align-items: center; gap: 4px; font-size: 11px;
+            background: #f1f5f9; padding: 6px 12px; border-radius: 20px; color: #475569; font-weight: 600; cursor: pointer;
+        }
+
+        .nav-right { display: flex; align-items: center; gap: 8px; }
+        .profile-btn { background: #f1f5f9; border: 1px solid #cbd5e1; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; }
+        
+        .vendor-container { display: flex; flex-direction: column; align-items: center; }
+        .vendor-btn button { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: #fff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 10px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+        .sub-timer { font-size: 8px; color: #e11d48; font-weight: bold; margin-top: 2px; text-align: center; }
+
+        /* --- Shifted Up Hero Section --- */
+        .hero-section {
+            position: relative; 
+            text-align: center; 
+            padding: 10px 20px 40px 20px;
+            min-height: 270px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            background: linear-gradient(135deg, #07162c 0%, #0f2b4c 50%, #1e3a8a 100%); 
+            overflow: hidden;
+        }
+        .hero-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 750px; height: 750px; background: radial-gradient(circle, rgba(14, 165, 233, 0.45) 0%, rgba(0, 0, 0, 0) 70%); z-index: 1; pointer-events: none; }
+        
+        .hero-content { 
+            position: relative; 
+            z-index: 2; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: flex-start;
+            width: 100%;
+            margin-top: -10px;
+        }
+        
+        .hero-weather-widget {
+            position: absolute; top: 8px; right: 15px; z-index: 10;
+            display: flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3); backdrop-filter: blur(8px);
+            padding: 4px 10px; border-radius: 20px; font-size: 11px; color: #ffffff; font-weight: bold;
+        }
+
+        .hero-top-logo { 
+            display: block; 
+            margin: -50px auto -115px auto; 
+            width: 320px; 
+            max-width: 90%;
+            height: auto; 
+            object-fit: contain; 
+            filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.5)); 
+        }
+
+        .hero-section h1 { 
+            font-size: 34px; 
+            margin-top: 0; 
+            margin-bottom: 14px; 
+            font-weight: 700; 
+            letter-spacing: 0.2px; 
+            line-height: 1;
+            position: relative;
+            z-index: 3;
+            display: inline-block;
+
+            background: linear-gradient(90deg, 
+                #56a2c0 0%,   
+                #6ca5b2 20%,  
+                #859b92 40%,  
+                #a99573 65%,  
+                #c2925b 85%,  
+                #ca8c49 100%  
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));
+        }
+
+        .search-container {
+            display: flex; align-items: center; width: 100%; max-width: 580px; margin: 0 auto;
+            background: #fff; border-radius: 35px; padding: 6px 15px 6px 20px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+        }
+        .search-container input { flex: 1; border: none; padding: 10px 0; font-size: 15px; outline: none; color: #333; background: transparent; }
+        .search-actions { display: flex; align-items: center; gap: 8px; }
+
+        .ai-scan-icon-btn { background: transparent; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 5px; }
+        .scanner-corner-svg { width: 22px; height: 22px; stroke: #0284c7; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+        .mic-btn {
+            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+            border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            padding: 8px; border-radius: 50%; box-shadow: 0 4px 10px rgba(14, 165, 233, 0.4);
+        }
+        .mic-icon-svg { width: 18px; height: 18px; fill: #ffffff; }
+
+        /* Main Container & Grid Formatting */
+        .main-container { max-width: 1000px; margin: 0 auto; padding: 20px 15px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; margin-top: 22px; }
+        .section-title { font-size: 15px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 6px; }
+
+        /* Strict Uniform Equal-Sized 4-Column Grid */
+        .categories-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 10px; 
+            margin-bottom: 15px; 
+        }
+        .category-card { 
+            background: #ffffff; 
+            padding: 12px 4px; 
+            border-radius: 14px; 
+            text-align: center; 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03); 
+            cursor: pointer; 
+            border: 1px solid #e2e8f0; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 82px;
+        }
+        .category-card .icon { font-size: 24px; display: block; margin-bottom: 4px; }
+        .category-card h3 { font-size: 10.5px; color: #1e293b; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+        .emergency-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
+        .emergency-card { 
+            background: #fff5f5; 
+            border: 1px solid #feb2b2; 
+            padding: 12px 4px; 
+            border-radius: 14px; 
+            text-align: center; 
+            cursor: pointer; 
+            height: 82px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .emergency-card .icon { font-size: 24px; display: block; margin-bottom: 4px; }
+        .emergency-card h3 { font-size: 10.5px; color: #c53030; font-weight: bold; }
+
+        /* Enlarged Banners & Headings */
+        .brand-new-banner { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: #fff; padding: 16px 18px; border-radius: 14px; margin: 25px 0 15px 0; display: flex; justify-content: space-between; align-items: center; }
+        .brand-new-banner h2 { font-size: 19px; margin-bottom: 3px; color: #38bdf8; font-weight: 800; letter-spacing: 0.3px; }
+        .brand-new-banner p { font-size: 11.5px; color: #cbd5e1; margin: 0; font-weight: 500; }
+        .btn-brand-new { background: #0284c7; color: #fff; border: none; padding: 9px 14px; border-radius: 8px; font-weight: bold; font-size: 11.5px; cursor: pointer; white-space: nowrap; }
+
+        .secondhand-banner { background: linear-gradient(135deg, #78350f 0%, #b45309 50%, #d97706 100%); color: #fff; padding: 16px 18px; border-radius: 14px; margin: 30px 0 15px 0; display: flex; justify-content: space-between; align-items: center; }
+        .secondhand-banner h2 { font-size: 19px; margin-bottom: 3px; color: #fef08a; font-weight: 800; letter-spacing: 0.3px; }
+        .secondhand-banner p { font-size: 11.5px; color: #ffedd5; margin: 0; font-weight: 500; }
+        .btn-secondhand { background: #eab308; color: #422006; border: none; padding: 9px 14px; border-radius: 8px; font-weight: bold; font-size: 11.5px; cursor: pointer; white-space: nowrap; }
+
+        /* Horizontal Scroll Items */
+        .horizontal-scroll-container { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: thin; }
+        .product-card { min-width: 135px; max-width: 135px; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.03); }
+        .product-img { width: 100%; height: 85px; background: #f8fafc; display: flex; align-items: center; justify-content: center; font-size: 28px; position: relative; }
+        .badge-new { position: absolute; top: 6px; left: 6px; background: #0284c7; color: #fff; font-size: 8px; padding: 2px 5px; border-radius: 3px; font-weight: bold; }
+        .product-details { padding: 8px; }
+        .product-title { font-size: 11px; font-weight: 600; color: #1e293b; margin: 0 0 3px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-price { font-size: 11px; font-weight: bold; color: #d97706; margin: 0 0 2px 0; }
+        .product-loc { font-size: 8.5px; color: #16a34a; margin: 0; }
+
+        .footer { display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; padding: 22px; background-color: #ffffff; border-top: 1px solid #e2e8f0; margin-top: 35px; }
+        .footer a { color: #64748b; text-decoration: none; font-size: 12px; font-weight: 500; }
+    </style>
+</head>
+<body>
+
+    <!-- SOS Panic Alert -->
+    <div class="sos-overlay" id="sosPanicOverlay">
+        <div class="sos-pulse-ring">🚨</div>
+        <h2 style="font-size: 22px; margin-bottom: 10px;">SOS EMERGENCY SHIELD ACTIVE</h2>
+        <p style="font-size: 13px; max-width: 380px; margin-bottom: 20px;">Broadcasting your live GPS location to emergency contacts...</p>
+        <button onclick="deactivateSOS()" style="background: white; color: #dc2626; border: none; padding: 10px 22px; border-radius: 8px; font-weight: bold; cursor: pointer;">Cancel / I am Safe</button>
+    </div>
+
+    <!-- Header / Navbar -->
+    <header class="navbar">
+        <div class="nav-left">
+            <button class="menu-toggle-btn" title="Open Menu">
+                <span></span><span></span><span></span>
+            </button>
+            <div class="nav-brand">
+                <img src="https://i.ibb.co/FkGDPdNm/1786456643728.png" alt="Logo" class="nav-logo">
+                <div class="logo">WYW</div>
+            </div>
+        </div>
+
+        <div class="location-badge">
+            <span>📍 Bhopal, India</span>
+        </div>
+
+        <div class="nav-right">
+            <button class="profile-btn" title="Profile">👤</button>
+            <div class="vendor-container">
+                <div class="vendor-btn">
+                    <button>Free Registration</button>
+                </div>
+                <div class="sub-timer">⏳ 11h 45m left</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Shifted Hero Section -->
+    <section class="hero-section">
+        <div class="hero-weather-widget">
+            <span>☀️</span>
+            <span>24°C</span>
+        </div>
+
+        <div class="hero-glow"></div>
+        <div class="hero-content">
+            <img src="https://i.ibb.co/FkGDPdNm/1786456643728.png" alt="What You Want Logo" class="hero-top-logo">
+            
+            <h1>What You Want?</h1>
+            
+            <div class="search-container">
+                <input type="text" placeholder="What You Want? Search anything...">
+                <div class="search-actions">
+                    <button class="ai-scan-icon-btn" title="AI Scanner">
+                        <svg class="scanner-corner-svg" viewBox="0 0 24 24">
+                            <path d="M4 8V6a2 2 0 0 1 2-2h2"/>
+                            <path d="M16 4h2a2 2 0 0 1 2 2v2"/>
+                            <path d="M20 16v2a2 2 0 0 1-2 2h-2"/>
+                            <path d="M8 20H6a2 2 0 0 1-2-2v-2"/>
+                        </svg>
+                    </button>
+                    <button class="mic-btn" title="Voice Search">
+                        <svg class="mic-icon-svg" viewBox="0 0 24 24">
+                            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Main Content Container -->
+    <div class="main-container">
+
+        <!-- ⚡ Instant Deliveries & Rides -->
+        <div class="section-header"><div class="section-title">⚡ Instant Deliveries & Rides</div></div>
+        <div class="categories-grid">
+            <div class="category-card"><span class="icon">🍔</span><h3>Food</h3></div>
+            <div class="category-card"><span class="icon">🛵</span><h3>Rides</h3></div>
+            <div class="category-card"><span class="icon">🛒</span><h3>Grocery</h3></div>
+            <div class="category-card" style="background: #e0f2fe; border-color: #bae6fd;"><span class="icon">🗺️</span><h3 style="color: #0369a1;">Live Map</h3></div>
+        </div>
+
+        <!-- 🛠️ Home Services, Labor & Artisans -->
+        <div class="section-header"><div class="section-title">🛠️ Home Services, Labor & Artisans</div></div>
+        <div class="categories-grid">
+            <div class="category-card"><span class="icon">💻</span><h3>PC Repair</h3></div>
+            <div class="category-card"><span class="icon">🪑</span><h3>Furniture</h3></div>
+            <div class="category-card"><span class="icon">🔧</span><h3>Plumbers</h3></div>
+            <div class="category-card"><span class="icon">⚡</span><h3>Electricians</h3></div>
+            
+            <div class="category-card"><span class="icon">📱</span><h3>Mobile Repairing</h3></div>
+            <div class="category-card"><span class="icon">🧺</span><h3>Appliances Repair</h3></div>
+            <div class="category-card"><span class="icon">🏍️</span><h3>2-Wheeler Mech</h3></div>
+            <div class="category-card"><span class="icon">🧰</span><h3>4-Wheeler Mech</h3></div>
+
+            <div class="category-card"><span class="icon">👷</span><h3>Daily Labor</h3></div>
+            <div class="category-card"><span class="icon">🧵</span><h3>Tailors</h3></div>
+            <div class="category-card"><span class="icon">🧱</span><h3>Hardware</h3></div>
+            <div class="category-card"><span class="icon">🚗</span><h3>Drivers</h3></div>
+
+            <div class="category-card"><span class="icon">👨‍🍳</span><h3>Cooks</h3></div>
+            <div class="category-card"><span class="icon">🎨</span><h3>Painters</h3></div>
+            <div class="category-card"><span class="icon">🧹</span><h3>Cleaning</h3></div>
+            <div class="category-card"><span class="icon">🦟</span><h3>Pest Control</h3></div>
+        </div>
+
+        <!-- 🌟 Professional & Useful Services -->
+        <div class="section-header"><div class="section-title">🌟 Professional & Useful Services</div></div>
+        <div class="categories-grid">
+            <div class="category-card"><span class="icon">🏥</span><h3>Hospitals</h3></div>
+            <div class="category-card"><span class="icon">🏛️</span><h3>Banquets</h3></div>
+            
+            <!-- Long-Neck Wall Mounted CCTV Icon -->
+            <div class="category-card">
+                <span class="icon" style="display: flex; justify-content: center; align-items: center; height: 26px;">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 19V9" stroke-width="2.5"/>
+                        <path d="M4 12h5a2 2 0 0 0 2-2V9"/>
+                        <rect x="9" y="5" width="11" height="7" rx="2" fill="#0284c7" stroke="#0369a1"/>
+                        <path d="M20 7l3 1v2l-3 1" fill="#0369a1"/>
+                        <circle cx="12" cy="8.5" r="1" fill="#ef4444"/>
+                    </svg>
+                </span>
+                <h3>CCTV / Security</h3>
+            </div>
+
+            <div class="category-card"><span class="icon">🚨</span><h3>Alarm Systems</h3></div>
+
+            <div class="category-card"><span class="icon">🧯</span><h3>Fire Systems</h3></div>
+            <div class="category-card"><span class="icon">⚖️</span><h3>Advocate</h3></div>
+            <div class="category-card"><span class="icon">🩺</span><h3>Doctors</h3></div>
+            <div class="category-card"><span class="icon">🍽️</span><h3>Caterers</h3></div>
+
+            <div class="category-card"><span class="icon">📷</span><h3>Camera & Equip</h3></div>
+            <div class="category-card"><span class="icon">📚</span><h3>Teachers</h3></div>
+            <div class="category-card"><span class="icon">🏫</span><h3>Coaching</h3></div>
+            <div class="category-card"><span class="icon">📊</span><h3>CA / Tax</h3></div>
+
+            <div class="category-card"><span class="icon">💄</span><h3>Beautician</h3></div>
+            <div class="category-card"><span class="icon">🎉</span><h3>Events</h3></div>
+            <div class="category-card"><span class="icon">🐶</span><h3>Pet Care</h3></div>
+            <div class="category-card"><span class="icon">🌐</span><h3>Internet</h3></div>
+        </div>
+
+        <!-- 🤝 Community & Neighbors Help -->
+        <div class="section-header"><div class="section-title">🤝 Community & Neighbors Help (Barter Circle)</div></div>
+        <div class="categories-grid">
+            <div class="category-card"><span class="icon">🛠️</span><h3>Borrow Tools</h3></div>
+            <div class="category-card"><span class="icon">🤝</span><h3>Help Circle</h3></div>
+            <div class="category-card"><span class="icon">🔄</span><h3>Barter Items</h3></div>
+            <div class="category-card"><span class="icon">🚗</span><h3>Carpooling</h3></div>
+        </div>
+
+        <!-- 🚨 Emergency Helpline & SOS Shield -->
+        <div class="section-header"><div class="section-title" style="color: #c53030;">🚨 Emergency Helpline & SOS Shield</div></div>
+        <div class="emergency-grid">
+            <div class="emergency-card"><span class="icon">👮‍♂️</span><h3>Police</h3></div>
+            <div class="emergency-card"><span class="icon">🚑</span><h3>Ambulance</h3></div>
+            <div class="emergency-card"><span class="icon">🚒</span><h3>Fire Dept</h3></div>
+            <div class="emergency-card" onclick="triggerSOSPanic()" style="background: #fee2e2; border-color: #f87171;"><span class="icon">🚨</span><h3 style="color: #dc2626;">SOS Panic</h3></div>
+        </div>
+
+        <!-- ✨ BRAND NEW SUPER MALL SECTION (Enlarged Heading) -->
+        <div class="brand-new-banner">
+            <div>
+                <h2>✨ Brand New Super Mall</h2>
+                <p>Direct Home Delivery | Global Warranty Products</p>
+            </div>
+            <button class="btn-brand-new">Explore Mall ➔</button>
+        </div>
+
+        <div class="categories-grid" style="margin-bottom: 12px;">
+            <div class="category-card"><span class="icon">📱</span><h3>Mobiles</h3></div>
+            <div class="category-card"><span class="icon">⌚</span><h3>Watches</h3></div>
+            <div class="category-card"><span class="icon">👟</span><h3>Shoes</h3></div>
+            <div class="category-card"><span class="icon">🚗</span><h3>Vehicles</h3></div>
+            <div class="category-card"><span class="icon">👕</span><h3>Fashion</h3></div>
+            <div class="category-card"><span class="icon">📺</span><h3>Electronics</h3></div>
+        </div>
+
+        <div class="horizontal-scroll-container">
+            <div class="product-card">
+                <div class="product-img"><span class="badge-new">NEW</span>📦</div>
+                <div class="product-details">
+                    <div class="product-title">Wireless Earbuds Pro</div>
+                    <div class="product-price">₹1,499</div>
+                    <div class="product-loc">⚡ Free Delivery</div>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-img"><span class="badge-new">NEW</span>⌚</div>
+                <div class="product-details">
+                    <div class="product-title">Smart Fitness Watch</div>
+                    <div class="product-price">₹2,299</div>
+                    <div class="product-loc">⚡ Free Delivery</div>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-img"><span class="badge-new">NEW</span>👟</div>
+                <div class="product-details">
+                    <div class="product-title">Running Sports Shoes</div>
+                    <div class="product-price">₹1,899</div>
+                    <div class="product-loc">⚡ Free Delivery</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🔄 SECOND-HAND MEGA BAZAAR SECTION (Enlarged Heading) -->
+        <div class="secondhand-banner">
+            <div>
+                <h2>🔄 Second-Hand Mega Bazaar</h2>
+                <p>Smart Savings | Buy & Sell Locally Worldwide</p>
+            </div>
+            <button class="btn-secondhand">Open Bazaar ➔</button>
+        </div>
+
+        <div class="categories-grid">
+            <div class="category-card"><span class="icon">📱</span><h3>Mobiles</h3></div>
+            <div class="category-card"><span class="icon">⌚</span><h3>Watches</h3></div>
+            <div class="category-card"><span class="icon">👟</span><h3>Shoes</h3></div>
+            <div class="category-card"><span class="icon">🚗</span><h3>Vehicles</h3></div>
+            <div class="category-card"><span class="icon">🪑</span><h3>Furniture</h3></div>
+            <div class="category-card"><span class="icon">🔌</span><h3>Appliances</h3></div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <a href="#">About Us</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Use</a>
+        <a href="#">Help & Support</a>
+    </footer>
+
+    <script>
+        function triggerSOSPanic() {
+            document.getElementById('sosPanicOverlay').classList.add('active');
+        }
+
+        function deactivateSOS() {
+            document.getElementById('sosPanicOverlay').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
